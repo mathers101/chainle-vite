@@ -3,6 +3,8 @@ import { chain } from "../assets/chains";
 
 type Status = "loading" | "initial" | "correct" | "incorrect" | "guessing" | "winner" | "loser";
 
+const MAX_INCORRECT_GUESSES = 6;
+
 interface ChainContextData {
   currentChain: string[];
   status: Status;
@@ -11,6 +13,7 @@ interface ChainContextData {
   incorrectGuesses: number[];
   topIndex: number;
   bottomIndex: number;
+  guessesRemaining: number;
 }
 
 interface ChainContextApi {
@@ -34,7 +37,7 @@ interface ChainAction {
 }
 
 const initialState = {
-  currentChain: chain.map((word, index) => (index === 0 || index === chain.length - 1 ? word : "")),
+  currentChain: chain.map((word, index) => (index === 0 || index === chain.length - 1 ? word : word.slice(0, 1))),
   correctChain: chain,
   status: "initial" as Status,
   selectedIndex: 1,
@@ -64,31 +67,33 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
         const guess = currentGuess.trim().toLowerCase();
         if (guess.length === currentChain[selectedIndex].length) return state;
         const isCorrect = guess === correctAnswer;
-        return {
-          ...state,
-          currentChain: isCorrect
-            ? currentChain.map((word, index) => (index === selectedIndex ? correctAnswer : word))
-            : currentChain,
-          status: isCorrect ? "correct" : "incorrect",
-          currentGuess: "",
-          incorrectGuesses: isCorrect
-            ? incorrectGuesses
-            : incorrectGuesses.map((count, index) => (index === selectedIndex ? count + 1 : count)),
-          // selectedIndex: null,
-        };
+        if (isCorrect) {
+          return {
+            ...state,
+            status: "correct",
+            currentChain: currentChain.map((word, index) => (index === selectedIndex ? correctAnswer : word)),
+            currentGuess: "",
+          };
+        } else {
+          return {
+            ...state,
+            status: "incorrect",
+            currentChain: currentChain.map((word, index) =>
+              index === selectedIndex ? correctAnswer.slice(0, word.length + 1) : word
+            ),
+            incorrectGuesses: incorrectGuesses.map((count, index) => (index === selectedIndex ? count + 1 : count)),
+            currentGuess: "",
+          };
+        }
       }
       case "setSelectedIndex": {
         const { currentChain } = state;
         const currentlyRevealed = currentChain[action.payload] || "";
-        const newlyRevealed = correctChain[action.payload].slice(0, currentlyRevealed.length + 1);
         return {
           ...state,
           selectedIndex: action.payload,
-          currentGuess: newlyRevealed,
+          currentGuess: currentlyRevealed,
           status: "guessing",
-          currentChain: currentChain.map((word, index) =>
-            index === action.payload ? correctChain[action.payload].slice(0, word.length + 1) : word
-          ),
         };
       }
       case "setWinner": {
@@ -108,10 +113,18 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
   );
   const chainLength = correctChain.length;
 
+  const numIncorrectGuesses = incorrectGuesses.reduce((acc, count) => acc + count, 0);
+  const guessesRemaining = MAX_INCORRECT_GUESSES - numIncorrectGuesses;
+
   useEffect(() => {
-    const winner = topIndex === -1;
-    if (winner) {
+    if (guessesRemaining === 0) {
+      dispatch({ type: "setLoser" });
+      return;
+    }
+    // topIndex === -1 is our sign that the player has won, it means that currentChain and correctChain are identical
+    if (topIndex === -1) {
       dispatch({ type: "setWinner" });
+      return;
     }
   }, [currentChain]);
 
@@ -139,6 +152,7 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
         selectedIndex,
         topIndex,
         bottomIndex,
+        guessesRemaining,
         incorrectGuesses,
       }}
     >

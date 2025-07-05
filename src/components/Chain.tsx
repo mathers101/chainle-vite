@@ -3,7 +3,16 @@ import ChainInput from "./ChainInput";
 import NumberIncorrect from "./NumberIncorrect";
 
 export default function Chain() {
-  const { currentChain, status, topIndex, bottomIndex, selectedIndex, currentGuess, incorrectGuesses } = useChainData();
+  const {
+    currentChain,
+    status,
+    topIndex,
+    bottomIndex,
+    selectedIndex,
+    currentGuess,
+    incorrectGuesses,
+    guessesRemaining,
+  } = useChainData();
   const { confirmGuess } = useChainApi();
   return (
     <div className="flex flex-col gap-4">
@@ -12,6 +21,7 @@ export default function Chain() {
       <h2>Bottom index: {bottomIndex}</h2>
       <h2>Selected index: {selectedIndex}</h2>
       <h2>Current guess: {currentGuess}</h2>
+      <h2>Guesses remaining: {guessesRemaining}</h2>
       <div className="flex flex-col gap-3">
         {currentChain.map((_, index) => (
           <div className="flex flex-row items-center gap-2" key={index}>
@@ -20,7 +30,11 @@ export default function Chain() {
           </div>
         ))}
       </div>
-      <button onClick={confirmGuess} disabled={status !== "guessing"} className="mt-4 px-4 py-2 text-black rounded">
+      <button
+        onClick={confirmGuess}
+        disabled={status !== "guessing"}
+        className="mt-4 px-4 py-2 bg-blue-300 text-black rounded"
+      >
         Confirm guess
       </button>
     </div>
