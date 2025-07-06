@@ -126,12 +126,13 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
       dispatch({ type: "setWinner" });
       return;
     }
+    // save progress to local state
+    saveToLocalStorage({ currentChain, status, selectedIndex, currentGuess, incorrectGuesses, correctChain });
   }, [currentChain]);
 
   const topIndex = currentChain.findIndex((_, i) => currentChain[i] !== correctChain[i]);
   const bottomIndex =
     chainLength - currentChain.findIndex((_, i) => currentChain[chainLength - i] !== correctChain[chainLength - i]);
-  console.log(bottomIndex);
 
   const confirmGuess = () => {
     dispatch({ type: "confirmGuess" });
@@ -178,3 +179,8 @@ export function useChainApi() {
   }
   return context;
 }
+
+const saveToLocalStorage = (chainState: ChainState) => {
+  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+  localStorage.setItem(`puzzle-${today}`, JSON.stringify(chainState));
+};

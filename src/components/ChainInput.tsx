@@ -15,21 +15,6 @@ export default function ChainInput({ index }: ChainInputProps) {
   const isSolved = (!isInitialWord && (index < topIndex || index > bottomIndex)) || status === "winner";
   const currentlyRevealed = currentChain[index] || "";
 
-  // const word = currentChain[index] || "";
-  // const alreadyGuessed = index < topGuessIndex || index > bottomGuessIndex;
-  // const currentlyTopGuess = index === topGuessIndex;
-  // const currentlyBottomGuess = index === bottomGuessIndex;
-  // let currentlyRevealed: string;
-  // if (alreadyGuessed) {
-  //   currentlyRevealed = word;
-  // } else if (currentlyTopGuess) {
-  //   currentlyRevealed = word.slice(0, topWordIndex);
-  // } else if (currentlyBottomGuess) {
-  //   currentlyRevealed = word.slice(0, bottomWordIndex);
-  // } else {
-  //   currentlyRevealed = "";
-  // }
-
   const currentlyTopIndex = topIndex === index;
   const currentlyBottomIndex = bottomIndex === index;
 
@@ -67,8 +52,6 @@ export default function ChainInput({ index }: ChainInputProps) {
     }
   };
 
-  // const guessIndex = currentlyTopGuess ? topGuessIndex : currentlyBottomGuess ? bottomGuessIndex : null;
-
   useEffect(() => {
     if (currentlySelectedRef.current) {
       currentlySelectedRef.current.focus();
@@ -91,17 +74,19 @@ export default function ChainInput({ index }: ChainInputProps) {
       spellCheck={false}
     >
       <InputOTPGroup className="uppercase">
-        {Array.from({ length: 10 }, (_, index) => (
-          <InputOTPSlot
-            inputMode="text"
-            key={index}
-            index={index}
-            className={cn(
-              "border-gray-700",
-              isInitialWord ? "bg-yellow-400" : isSolved ? "bg-green-400" : disabled ? "bg-gray-300" : ""
-            )}
-          />
-        ))}
+        {Array.from({ length: 10 }, (_, letterIndex) => {
+          return (
+            <InputOTPSlot
+              inputMode="text"
+              key={letterIndex}
+              index={letterIndex}
+              className={cn(
+                "border-gray-700",
+                isInitialWord ? "bg-yellow-400" : isSolved ? "bg-green-500" : disabled ? "bg-gray-300" : ""
+              )}
+            />
+          );
+        })}
       </InputOTPGroup>
     </InputOTP>
   );

@@ -1,6 +1,7 @@
 import { useChainApi, useChainData } from "./ChainContext";
 import ChainInput from "./ChainInput";
 import NumberIncorrect from "./NumberIncorrect";
+import { Button } from "./ui/button";
 
 export default function Chain() {
   const {
@@ -30,13 +31,9 @@ export default function Chain() {
           </div>
         ))}
       </div>
-      <button
-        onClick={confirmGuess}
-        disabled={status !== "guessing"}
-        className="mt-4 px-4 py-2 bg-blue-300 text-black rounded"
-      >
+      <Button variant="secondary" className="text-black" onClick={confirmGuess} disabled={status !== "guessing"}>
         Confirm guess
-      </button>
+      </Button>
     </div>
   );
 }
