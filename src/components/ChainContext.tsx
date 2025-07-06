@@ -22,7 +22,7 @@ interface ChainContextApi {
   confirmGuess: () => void;
 }
 
-interface ChainState {
+export interface ChainState {
   currentChain: string[];
   correctChain: string[];
   status: Status;
