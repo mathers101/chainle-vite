@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, type PropsWithChildren } from "react";
-import { chain } from "../assets/chains";
+import { saveToLocalStorage } from "../lib/localStorage";
 
 type Status = "loading" | "initial" | "correct" | "incorrect" | "guessing" | "winner" | "loser";
 
@@ -36,23 +36,25 @@ interface ChainAction {
   payload?: any;
 }
 
-const initialState = {
-  currentChain: chain.map((word, index) => (index === 0 || index === chain.length - 1 ? word : word.slice(0, 1))),
-  correctChain: chain,
-  status: "initial" as Status,
-  selectedIndex: 1,
-  currentGuess: "",
-  incorrectGuesses: chain.map(() => 0),
-};
-
 const ChainDataContext = createContext<ChainContextData | null>(null);
 const ChainApiContext = createContext<ChainContextApi | null>(null);
 
 interface ChainProviderProps {
   correctChain: string[];
+  initialState: ChainState | null;
 }
 
-export function ChainProvider({ children, correctChain }: PropsWithChildren<ChainProviderProps>) {
+export function ChainProvider({ children, correctChain, initialState }: PropsWithChildren<ChainProviderProps>) {
+  const defaultInitialState = {
+    currentChain: correctChain.map((word, index) =>
+      index === 0 || index === correctChain.length - 1 ? word : word.slice(0, 1)
+    ),
+    correctChain,
+    status: "initial" as Status,
+    selectedIndex: null,
+    currentGuess: "",
+    incorrectGuesses: correctChain.map(() => 0),
+  };
   function reducer(state: ChainState, action: ChainAction): ChainState {
     switch (action.type) {
       case "setGuess": {
@@ -109,7 +111,7 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
 
   const [{ currentChain, status, selectedIndex, currentGuess, incorrectGuesses }, dispatch] = useReducer(
     reducer,
-    initialState
+    initialState ?? defaultInitialState
   );
   const chainLength = correctChain.length;
 
@@ -117,6 +119,10 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
   const guessesRemaining = MAX_INCORRECT_GUESSES - numIncorrectGuesses;
 
   useEffect(() => {
+    // save progress to local state
+    saveToLocalStorage({ currentChain, status, selectedIndex, currentGuess, incorrectGuesses, correctChain });
+
+    // if out of guesses, set the player as a loser
     if (guessesRemaining === 0) {
       dispatch({ type: "setLoser" });
       return;
@@ -126,8 +132,6 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
       dispatch({ type: "setWinner" });
       return;
     }
-    // save progress to local state
-    saveToLocalStorage({ currentChain, status, selectedIndex, currentGuess, incorrectGuesses, correctChain });
   }, [currentChain]);
 
   const topIndex = currentChain.findIndex((_, i) => currentChain[i] !== correctChain[i]);
@@ -179,8 +183,3 @@ export function useChainApi() {
   }
   return context;
 }
-
-const saveToLocalStorage = (chainState: ChainState) => {
-  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-  localStorage.setItem(`puzzle-${today}`, JSON.stringify(chainState));
-};
