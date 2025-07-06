@@ -20,7 +20,7 @@ export default function ChainInput({ index }: ChainInputProps) {
 
   const isSelecting = ["correct", "incorrect", "initial"].includes(status);
 
-  const currentlySelectable = isSelecting && (currentlyTopIndex || currentlyBottomIndex);
+  const currentlySelectable = (isSelecting || status === "guessing") && (currentlyTopIndex || currentlyBottomIndex);
   const currentlySelected = status === "guessing" && selectedIndex === index;
 
   const currentlyDisplayed = currentlySelected
@@ -32,10 +32,10 @@ export default function ChainInput({ index }: ChainInputProps) {
   const disabled = !(currentlySelectable || currentlySelected);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (currentlySelectable && e.key === "Enter") {
-      setSelectedIndex(index); // select on enter when tabbed in
-      e.preventDefault();
-    }
+    // if (currentlySelectable && e.key === "Enter") {
+    //   setSelectedIndex(index); // select on enter when tabbed in
+    //   e.preventDefault();
+    // }
     if (currentlySelected && e.key === "Enter") {
       if (currentGuess.length <= currentlyRevealed.length) return;
       confirmGuess();
@@ -64,7 +64,8 @@ export default function ChainInput({ index }: ChainInputProps) {
       inputMode="text"
       maxLength={10}
       value={currentlyDisplayed}
-      onClick={currentlySelectable ? () => setSelectedIndex(index) : undefined}
+      // onClick={currentlySelectable ? () => setSelectedIndex(index) : undefined}
+      onFocus={() => setSelectedIndex(index)}
       tabIndex={currentlySelectable || currentlySelected ? 0 : -1}
       disabled={disabled}
       className={cn(currentlySelectable ? "cursor-pointer" : "")}

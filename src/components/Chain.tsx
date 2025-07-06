@@ -7,14 +7,15 @@ import { Button } from "./ui/button";
 
 export default function Chain() {
   const { currentChain, status, incorrectGuesses, guessesRemaining } = useChainData();
-  const { confirmGuess } = useChainApi();
+  const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
+  const gameOver = status === "loser" || status === "winner";
 
   const nextGameComponent = (
     <span>{`Next chain available in ${hours} hours, ${minutes} minutes, ${seconds} seconds`}</span>
   );
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col justify-start items-center gap-4">
       <div
         className={cn(
           "p-4 mb-2 rounded text-center min-h-[60px] flex items-center justify-center transition-colors duration-200",
@@ -53,14 +54,20 @@ export default function Chain() {
             <NumberIncorrect num={incorrectGuesses[index]} />
           </div>
         ))}
-        <Button
-          variant="outline"
-          className="text-black w-full bg-blue-200"
-          onClick={confirmGuess}
-          disabled={status !== "guessing"}
-        >
-          Confirm guess
-        </Button>
+        {gameOver ? (
+          <Button variant="destructive" onClick={resetGame} className="bg-red-400 w-full">
+            Reset game
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="text-black w-full bg-blue-200"
+            onClick={confirmGuess}
+            disabled={status !== "guessing"}
+          >
+            Confirm guess
+          </Button>
+        )}
       </div>
     </div>
   );

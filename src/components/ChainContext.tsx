@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type PropsWithChildren } from "react";
 import { saveToLocalStorage } from "../lib/localStorage";
 
 type Status = "loading" | "initial" | "correct" | "incorrect" | "guessing" | "winner" | "loser";
@@ -20,6 +20,7 @@ interface ChainContextApi {
   setGuess: (guess: string) => void;
   setSelectedIndex: (index: number) => void;
   confirmGuess: () => void;
+  resetGame: () => void;
 }
 
 export interface ChainState {
@@ -104,6 +105,9 @@ export function ChainProvider({ children, correctChain, initialState }: PropsWit
       case "setLoser": {
         return { ...state, status: "loser" };
       }
+      case "resetGame": {
+        return defaultInitialState;
+      }
       default:
         throw new Error(`Unknown action type: ${action.type}`);
     }
@@ -138,32 +142,47 @@ export function ChainProvider({ children, correctChain, initialState }: PropsWit
   const bottomIndex =
     chainLength - currentChain.findIndex((_, i) => currentChain[chainLength - i] !== correctChain[chainLength - i]);
 
-  const confirmGuess = () => {
+  const confirmGuess = useCallback(() => {
     dispatch({ type: "confirmGuess" });
-  };
-  const setGuess = (guess: string) => {
+  }, []);
+
+  const setGuess = useCallback((guess: string) => {
     dispatch({ type: "setGuess", payload: guess });
-  };
-  const setSelectedIndex = (index: number) => {
+  }, []);
+
+  const setSelectedIndex = useCallback((index: number) => {
     dispatch({ type: "setSelectedIndex", payload: index });
-  };
+  }, []);
+
+  const resetGame = useCallback(() => dispatch({ type: "resetGame" }), []);
+
+  const data = useMemo(
+    () => ({
+      currentChain,
+      currentGuess,
+      status,
+      selectedIndex,
+      topIndex,
+      bottomIndex,
+      guessesRemaining,
+      incorrectGuesses,
+    }),
+    [currentChain, currentGuess, status, selectedIndex, topIndex, bottomIndex, guessesRemaining, incorrectGuesses]
+  );
+
+  const api = useMemo(
+    () => ({
+      setGuess,
+      setSelectedIndex,
+      confirmGuess,
+      resetGame,
+    }),
+    [setGuess, setSelectedIndex, confirmGuess, resetGame]
+  );
 
   return (
-    <ChainDataContext.Provider
-      value={{
-        currentChain,
-        currentGuess,
-        status,
-        selectedIndex,
-        topIndex,
-        bottomIndex,
-        guessesRemaining,
-        incorrectGuesses,
-      }}
-    >
-      <ChainApiContext.Provider value={{ setGuess, setSelectedIndex, confirmGuess }}>
-        {children}
-      </ChainApiContext.Provider>
+    <ChainDataContext.Provider value={data}>
+      <ChainApiContext.Provider value={api}>{children}</ChainApiContext.Provider>
     </ChainDataContext.Provider>
   );
 }
