@@ -22,7 +22,7 @@ interface ChainContextApi {
   confirmGuess: () => void;
 }
 
-interface ChainState {
+export interface ChainState {
   currentChain: string[];
   correctChain: string[];
   status: Status;
@@ -131,7 +131,6 @@ export function ChainProvider({ children, correctChain }: PropsWithChildren<Chai
   const topIndex = currentChain.findIndex((_, i) => currentChain[i] !== correctChain[i]);
   const bottomIndex =
     chainLength - currentChain.findIndex((_, i) => currentChain[chainLength - i] !== correctChain[chainLength - i]);
-  console.log(bottomIndex);
 
   const confirmGuess = () => {
     dispatch({ type: "confirmGuess" });
