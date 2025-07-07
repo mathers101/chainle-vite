@@ -1,14 +1,14 @@
-import type { ChainState } from "../components/ChainContext";
+import type { Guess } from "../components/ChainContext";
 import { getTodaysDate } from "./time";
 
-export const saveToLocalStorage = (chainState: ChainState) => {
+export const saveToLocalStorage = (userGuesses: Guess[]) => {
   const today = getTodaysDate();
-  localStorage.setItem(`chain-${today}`, JSON.stringify(chainState));
+  localStorage.setItem(`chain-${today}`, JSON.stringify(userGuesses));
 };
 
-export const fetchFromLocalStorage = (): ChainState | null => {
+export const fetchFromLocalStorage = (): Guess[] | null => {
   const today = getTodaysDate();
   const data = localStorage.getItem(`chain-${today}`);
-  if (!data) return null;
+  if (!data) return [];
   return JSON.parse(data);
 };

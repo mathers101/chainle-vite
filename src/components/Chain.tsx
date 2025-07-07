@@ -6,7 +6,7 @@ import NumberIncorrect from "./NumberIncorrect";
 import { Button } from "./ui/button";
 
 export default function Chain() {
-  const { currentChain, status, incorrectGuesses, guessesRemaining } = useChainData();
+  const { currentChain, status, mistakesByIndex, mistakesRemaining } = useChainData();
   const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
   const gameOver = status === "loser" || status === "winner";
@@ -42,26 +42,31 @@ export default function Chain() {
           </div>
         )}
       </div>
+      {/* <h2>currentChain: {JSON.stringify(currentChain)}</h2>
+      <h2>selectedIndex: {selectedIndex}</h2>
+      <h2>currentGuess: {currentGuess}</h2>
+      <h2>topIndex: {topIndex}</h2>
+      <h2>bottomIndex: {bottomIndex}</h2> */}
       <div className="flex items-center justify-center mb-2">
         <span className="px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-lg shadow">
-          Mistakes remaining: <span className="font-bold">{guessesRemaining}</span>
+          Mistakes remaining: <span className="font-bold">{mistakesRemaining}</span>
         </span>
       </div>
       <div className="relative flex flex-col gap-3">
         {currentChain.map((_, index) => (
           <div className="flex flex-row items-center" key={index}>
             <ChainInput index={index} />
-            <NumberIncorrect num={incorrectGuesses[index]} />
+            <NumberIncorrect num={mistakesByIndex[index]} />
           </div>
         ))}
         {gameOver ? (
-          <Button variant="destructive" onClick={resetGame} className="bg-red-400 w-full">
+          <Button variant="destructive" onClick={resetGame} className="w-full">
             Reset game
           </Button>
         ) : (
           <Button
             variant="outline"
-            className="text-black w-full bg-blue-200"
+            className="w-full bg-blue-200 hover:bg-blue-300"
             onClick={confirmGuess}
             disabled={status !== "guessing"}
           >
