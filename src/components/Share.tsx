@@ -28,7 +28,7 @@ export default function Share({ correctChain, userGuesses }: ShareProps) {
     })
     .join("\n");
 
-  const shareString = `Chainle ${date}\n${userGuesses.length}/${MAX_GUESSES} attempts\n\n${resultString}\n\n`;
+  const shareString = `Chainle ${date}\n${userGuesses.length}/${MAX_GUESSES} attempts\n\n${resultString}`;
 
   const handleShare = () => {
     if (navigator.share) {
