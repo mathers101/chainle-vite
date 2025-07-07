@@ -30,13 +30,13 @@ function App() {
 
   return (
     <div className="flex flex-col justify-center min-h-[90vh] pt-8 items-center">
-      {/* <Spinner /> */}
+      {/* <Spinner size="large" className="text-blue-300" /> */}
       {chain ? (
         <ChainProvider correctChain={chain} savedData={savedData}>
           <Chain />
         </ChainProvider>
       ) : (
-        <Spinner />
+        <Spinner size="large" className="text-blue-300" />
       )}
     </div>
   );
