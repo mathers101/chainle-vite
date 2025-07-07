@@ -81,7 +81,6 @@ export function ChainProvider({ children, correctChain, savedGuesses }: PropsWit
         }
         const correctAnswer = correctChain[selectedIndex].trim().toLowerCase();
         const guess = currentGuess.trim().toLowerCase();
-        console.log(guess);
         const isCorrect = guess === correctAnswer;
         if (isCorrect) {
           return {
