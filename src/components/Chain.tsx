@@ -6,7 +6,7 @@ import NumberIncorrect from "./NumberIncorrect";
 import { Button } from "./ui/button";
 
 export default function Chain() {
-  const { currentChain, status, mistakesByIndex, mistakesRemaining } = useChainData();
+  const { currentChain, status, mistakesByIndex, mistakesRemaining, selectedIndex, currentGuess } = useChainData();
   const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
   const gameOver = status === "loser" || status === "winner";
@@ -42,11 +42,9 @@ export default function Chain() {
           </div>
         )}
       </div>
-      {/* <h2>currentChain: {JSON.stringify(currentChain)}</h2>
+
       <h2>selectedIndex: {selectedIndex}</h2>
       <h2>currentGuess: {currentGuess}</h2>
-      <h2>topIndex: {topIndex}</h2>
-      <h2>bottomIndex: {bottomIndex}</h2> */}
       <div className="flex items-center justify-center mb-2">
         <span className="px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-lg shadow">
           Mistakes remaining: <span className="font-bold">{mistakesRemaining}</span>

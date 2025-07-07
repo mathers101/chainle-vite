@@ -81,12 +81,14 @@ export function ChainProvider({ children, correctChain, savedGuesses }: PropsWit
         }
         const correctAnswer = correctChain[selectedIndex].trim().toLowerCase();
         const guess = currentGuess.trim().toLowerCase();
+        console.log(guess);
         const isCorrect = guess === correctAnswer;
         if (isCorrect) {
           return {
             ...state,
             status: "correct",
             userGuesses: [...state.userGuesses, { index: selectedIndex, word: correctAnswer }],
+            selectedIndex: null,
             currentGuess: "",
           };
         } else {
@@ -94,6 +96,7 @@ export function ChainProvider({ children, correctChain, savedGuesses }: PropsWit
             ...state,
             status: "incorrect",
             userGuesses: [...state.userGuesses, { index: selectedIndex, word: guess }],
+            selectedIndex: null,
             // incorrectGuesses: incorrectGuesses.map((count, index) => (index === selectedIndex ? count + 1 : count)),
             currentGuess: "",
           };
