@@ -1,13 +1,18 @@
+import dayjs from "dayjs";
+
 export const getTodaysDate = () => {
-  const today = new Date();
-  return today.toISOString().split("T")[0];
+  const today = dayjs().format("YYYY-MM-DD");
+  return today;
+  // console.log("new date", today);
+  // console.log("iso", today.toISOString());
+  // return today.toISOString().split("T")[0];
 };
 
 export const timeUntilTomorrow = () => {
-  const now = new Date();
-  const tomorrow = new Date();
-  tomorrow.setHours(24, 0, 0, 0); // local midnight next day
-  let ms = tomorrow.getTime() - now.getTime();
+  const now = dayjs();
+  const tomorrow = dayjs().add(1, "day").startOf("day"); // start of the next day
+
+  const ms = tomorrow.diff(now); // difference in milliseconds
 
   const totalSeconds = Math.floor(ms / 1000);
   const hours = Math.floor(totalSeconds / 3600);
