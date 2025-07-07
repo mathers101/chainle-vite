@@ -119,22 +119,11 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
 
   const solvedByIndex: boolean[] = correctChain.map((_, index) => index === 0 || index === correctChain.length - 1);
 
-  // const numLettersByIndex = correctChain.map((_, i) => (i === 0 || i === correctChain.length - 1 ? 10 : 1));
-
   userGuesses.forEach((guess) => {
-    // let addedLetter = false;
-    // if we have saved guesses, we need to set the current guess to the last one
     for (let i = 1; i < correctChain.length - 1; i++) {
       if (guess[i] === correctChain[i]) {
-        // numLettersByIndex[i] = 10;
         solvedByIndex[i] = true;
       }
-      // if (!addedLetter && guess[i - 1] === correctChain[i - 1]) {
-      // if the previous or next word is correct, we can assume the current word is not solved
-      // numLettersByIndex[i] += 1;
-      // addedLetter = true;
-      // }
-      // }
     }
   });
 
