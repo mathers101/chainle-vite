@@ -8,12 +8,14 @@ interface ChainInputProps {
 }
 
 export default function ChainInput({ index }: ChainInputProps) {
-  const { currentChain, currentGuess, selectedIndex, status, topIndex, bottomIndex } = useChainData();
+  const { correctChain, currentChain, currentGuess, selectedIndex, solvedByIndex, status, topIndex, bottomIndex } =
+    useChainData();
   const { setGuess, setSelectedIndex, confirmGuess } = useChainApi();
 
   const isInitialWord = index === 0 || index === currentChain.length - 1;
-  const isSolved = (!isInitialWord && (index < topIndex || index > bottomIndex)) || status === "winner";
-  const currentlyRevealed = currentChain[index] || "";
+  const isSolved = solvedByIndex[index] || false;
+  // const isSolved = (!isInitialWord && (index < topIndex || index > bottomIndex)) || status === "winner";
+  const currentlyRevealed = (status === "loser" ? correctChain[index] : currentChain[index]) ?? "";
 
   const currentlyTopIndex = topIndex === index;
   const currentlyBottomIndex = bottomIndex === index;
@@ -32,12 +34,11 @@ export default function ChainInput({ index }: ChainInputProps) {
   const disabled = !(currentlySelectable || currentlySelected);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // if (currentlySelectable && e.key === "Enter") {
-    //   setSelectedIndex(index); // select on enter when tabbed in
-    //   e.preventDefault();
-    // }
+    if (currentlySelectable && e.key === "Enter") {
+      setSelectedIndex(index); // select on enter when tabbed in
+      e.preventDefault();
+    }
     if (currentlySelected && e.key === "Enter") {
-      if (currentGuess.length <= currentlyRevealed.length) return;
       confirmGuess();
       if (currentlySelectedRef.current) {
         currentlySelectedRef.current.blur();
@@ -64,8 +65,10 @@ export default function ChainInput({ index }: ChainInputProps) {
       inputMode="text"
       maxLength={10}
       value={currentlyDisplayed}
-      // onClick={currentlySelectable ? () => setSelectedIndex(index) : undefined}
-      onFocus={() => setSelectedIndex(index)}
+      onClick={currentlySelectable ? () => setSelectedIndex(index) : undefined}
+      // onFocus={() => {
+      //   setSelectedIndex(index);
+      // }}
       tabIndex={currentlySelectable || currentlySelected ? 0 : -1}
       disabled={disabled}
       className={cn(currentlySelectable ? "cursor-pointer" : "")}
