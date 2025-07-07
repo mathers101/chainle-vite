@@ -1,4 +1,4 @@
-import type { Guess, SaveData } from "../components/ChainContext";
+import type { SaveData } from "../components/ChainContext";
 import { getTodaysDate } from "./time";
 
 export const saveToLocalStorage = (userGuesses: SaveData) => {

@@ -1,6 +1,6 @@
 import "./App.css";
 import Chain from "./components/Chain";
-import { ChainProvider, type Guess, type SaveData } from "./components/ChainContext";
+import { ChainProvider, type SaveData } from "./components/ChainContext";
 import { useEffect, useState } from "react";
 import { getTodaysDate } from "./lib/time";
 import { createClient } from "@supabase/supabase-js";
