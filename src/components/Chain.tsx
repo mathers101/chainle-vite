@@ -6,7 +6,7 @@ import NumberIncorrect from "./NumberIncorrect";
 import { Button } from "./ui/button";
 
 export default function Chain() {
-  const { currentChain, status, mistakesByIndex, mistakesRemaining, selectedIndex, currentGuess } = useChainData();
+  const { currentChain, status, mistakesByIndex, mistakesRemaining } = useChainData();
   const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
   const gameOver = status === "loser" || status === "winner";
