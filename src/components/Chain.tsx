@@ -2,10 +2,11 @@ import { timeUntilTomorrow } from "../lib/time";
 import { cn } from "../lib/utils";
 import { useChainApi, useChainData } from "./ChainContext";
 import ChainInput from "./ChainInput";
+import Share from "./Share";
 import { Button } from "./ui/button";
 
 export default function Chain() {
-  const { currentChain, guessesRemaining, status } = useChainData();
+  const { userGuesses, correctChain, currentChain, guessesRemaining, status } = useChainData();
   const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
   const isWinner = status === "winner";
@@ -51,18 +52,22 @@ export default function Chain() {
       <h2>status: {status}</h2>
       <h2 className="text-lg font-semibold text-gray-700">Current chain: {currentChain}</h2> */}
       <div className="flex items-center justify-center mb-2">
-        <span
-          className={cn(
-            "px-4 py-2 rounded-full font-semibold text-lg shadow",
-            guessesRemaining >= 5
-              ? "bg-green-100 text-green-800"
-              : guessesRemaining >= 3
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
-          )}
-        >
-          Guesses remaining: <span className="font-bold">{guessesRemaining}</span>
-        </span>
+        {gameOver ? (
+          <Share correctChain={correctChain} userGuesses={userGuesses} />
+        ) : (
+          <span
+            className={cn(
+              "px-4 py-2 rounded-full font-semibold text-lg shadow",
+              guessesRemaining >= 5
+                ? "bg-green-100 text-green-800"
+                : guessesRemaining >= 3
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-red-100 text-red-800"
+            )}
+          >
+            Guesses remaining: <span className="font-bold">{guessesRemaining}</span>
+          </span>
+        )}
       </div>
       <div className="relative flex flex-col gap-3">
         {currentChain.map((_, index) => (

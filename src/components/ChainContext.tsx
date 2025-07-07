@@ -4,8 +4,10 @@ import { saveToLocalStorage } from "../lib/localStorage";
 export const MAX_GUESSES = 5;
 
 type Status = "guessing" | "selecting" | "winner" | "loser";
+export type Guess = string[];
 
 interface ChainContextData {
+  userGuesses: Guess[];
   correctChain: string[];
   currentChain: string[];
   currentGuess: string[];
@@ -20,8 +22,6 @@ interface ChainContextApi {
   resetGame: () => void;
   selectHintIndex: (index: number) => void;
 }
-
-export type Guess = string[];
 
 export interface ChainState {
   userGuesses: Guess[];
@@ -187,9 +187,10 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
       currentGuess,
       solvedByIndex,
       status,
+      userGuesses,
       guessesRemaining,
     }),
-    [correctChain, status, currentChain, currentGuess, guessesRemaining, solvedByIndex]
+    [correctChain, status, currentChain, userGuesses, currentGuess, guessesRemaining, solvedByIndex]
   );
 
   const api = useMemo(
