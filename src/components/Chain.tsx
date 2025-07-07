@@ -42,9 +42,8 @@ export default function Chain() {
           </div>
         )}
       </div>
-
-      <h2>selectedIndex: {selectedIndex}</h2>
-      <h2>currentGuess: {currentGuess}</h2>
+      {/* <h2>selectedIndex: {selectedIndex}</h2>
+      <h2>currentGuess: {currentGuess}</h2> */}
       <div className="flex items-center justify-center mb-2">
         <span className="px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-lg shadow">
           Mistakes remaining: <span className="font-bold">{mistakesRemaining}</span>
