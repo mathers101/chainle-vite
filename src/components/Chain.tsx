@@ -31,7 +31,7 @@ export default function Chain() {
         {status === "initial" && "Welcome! Please select an entry in the chain to start guessing."}
         {status === "winner" && (
           <div className="flex flex-col">
-            <span>🎉 Congratulations, you solved the chain! 🎉</span>
+            <span>🎉 Congratulations! 🎉</span>
             {nextGameComponent}
           </div>
         )}

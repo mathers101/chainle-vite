@@ -27,7 +27,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="flex flex-col min-h-[100%] pt-8 items-center">
       {chain ? (
         <ChainProvider correctChain={chain} savedGuesses={savedData}>
           <Chain />
@@ -35,7 +35,7 @@ function App() {
       ) : (
         <Spinner />
       )}
-    </>
+    </div>
   );
 }
 
