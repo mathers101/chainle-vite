@@ -7,26 +7,46 @@ interface ChainInputProps {
 }
 
 export default function ChainInput({ index }: ChainInputProps) {
-  const { correctChain, currentChain, currentGuess, isWinner, isLoser, solvedByIndex } = useChainData();
-  const { setGuess, confirmGuess } = useChainApi();
+  const { status, correctChain, currentChain, currentGuess, solvedByIndex } = useChainData();
+  const { setGuess, selectHintIndex } = useChainApi();
 
+  const isWinner = status === "winner";
+  const isLoser = status === "loser";
   const isInitialWord = index === 0 || index === currentChain.length - 1;
   const isSolved = solvedByIndex[index] || false;
   // const isSolved = (!isInitialWord && (index < topIndex || index > bottomIndex)) || status === "winner";
   const currentlyRevealed = (isLoser ? correctChain[index] : currentChain[index]) ?? "";
+
+  const isSelectable = status === "selecting" && !isSolved;
+  const handleSelect = () => selectHintIndex(index);
+
+  const isGuessing = status === "guessing";
 
   const gameOver = isWinner || isLoser;
   const disabled = gameOver || isSolved;
 
   const currentlyDisplayed = isLoser ? correctChain[index] : currentGuess[index];
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      confirmGuess();
+  const onClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    if (isSelectable) {
+      handleSelect();
+      e.currentTarget.select();
     }
   };
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (isSelectable && e.key === "Enter") {
+      handleSelect();
+    }
+    // if (e.key === "Enter") {
+    //   confirmGuess();
+    // }
+  };
+
   const onChange = (value: string) => {
+    if (!isGuessing) {
+      return;
+    }
     const filtered = value.replace(/[^A-Za-z]/g, "");
     if (filtered.length >= currentlyRevealed.length) {
       setGuess(index, filtered);
@@ -41,6 +61,7 @@ export default function ChainInput({ index }: ChainInputProps) {
       value={currentlyDisplayed}
       tabIndex={disabled ? -1 : 0}
       disabled={disabled}
+      onClick={onClick}
       className={cn(!disabled ? "cursor-pointer" : "")}
       onKeyDown={onKeyDown}
       onChange={onChange}

@@ -1,6 +1,6 @@
 import "./App.css";
 import Chain from "./components/Chain";
-import { ChainProvider, type Guess } from "./components/ChainContext";
+import { ChainProvider, type Guess, type SaveData } from "./components/ChainContext";
 import { useEffect, useState } from "react";
 import { getTodaysDate } from "./lib/time";
 import { createClient } from "@supabase/supabase-js";
@@ -12,12 +12,14 @@ const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env
 function App() {
   const today = getTodaysDate();
   const [chain, setChain] = useState<string[] | null>(null);
-  const [savedData, setSavedData] = useState<Guess[] | null>(null);
+  const [savedData, setSavedData] = useState<SaveData | null>(null);
 
   // to anybody reading this, I realize a useEffect is a ridiculous way to fetch data you need on a real app. This app is extremely simple and doesn't currently have other features that would call for bringing in React Query, etc.
   useEffect(() => {
     const saved = fetchFromLocalStorage();
-    setSavedData(saved);
+    if (saved?.userGuesses && saved?.hintsByIndex) {
+      setSavedData(saved);
+    }
     getTodaysChain();
   }, []);
 
@@ -27,9 +29,10 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-[100%] pt-8 items-center">
+    <div className="flex flex-col justify-center min-h-[90vh] pt-8 items-center">
+      {/* <Spinner /> */}
       {chain ? (
-        <ChainProvider correctChain={chain} savedGuesses={savedData}>
+        <ChainProvider correctChain={chain} savedData={savedData}>
           <Chain />
         </ChainProvider>
       ) : (

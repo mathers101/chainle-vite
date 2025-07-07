@@ -5,10 +5,14 @@ import ChainInput from "./ChainInput";
 import { Button } from "./ui/button";
 
 export default function Chain() {
-  const { currentChain, guessesRemaining, isWinner, isLoser } = useChainData();
+  const { currentChain, guessesRemaining, status } = useChainData();
   const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
+  const isWinner = status === "winner";
+  const isLoser = status === "loser";
   const gameOver = isWinner || isLoser;
+  const isSelecting = status === "selecting";
+  const otherwise = !isSelecting && !gameOver;
 
   const nextGameComponent = (
     <span>{`Next chain available in ${hours} hours, ${minutes} minutes, ${seconds} seconds`}</span>
@@ -22,10 +26,13 @@ export default function Chain() {
             ? "bg-green-100 text-green-800 font-bold text-xl animate-bounce"
             : isLoser
             ? "bg-red-100 text-red-800 font-bold text-xl"
+            : isSelecting
+            ? "bg-yellow-100 text-yellow-800 font-semibold text-lg"
             : "bg-blue-100 text-blue-800 font-semibold text-lg"
         )}
       >
-        {!gameOver && "Attempt to guess the chain of words!"}
+        {isSelecting && "Select a word to reveal a letter!"}
+        {otherwise && "Attempt to guess the entire chain of words!"}
         {isWinner && (
           <div className="flex flex-col">
             <span>🎉 Congratulations! 🎉</span>
@@ -39,10 +46,21 @@ export default function Chain() {
           </div>
         )}
       </div>
-      {/* <h2>selectedIndex: {selectedIndex}</h2>
-      <h2>currentGuess: {currentGuess}</h2> */}
+      {/* <h2>selectedIndex: {selectedIndex}</h2>*/}
+      {/* <h2>currentGuess: {currentGuess}</h2>
+      <h2>status: {status}</h2>
+      <h2 className="text-lg font-semibold text-gray-700">Current chain: {currentChain}</h2> */}
       <div className="flex items-center justify-center mb-2">
-        <span className="px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-lg shadow">
+        <span
+          className={cn(
+            "px-4 py-2 rounded-full font-semibold text-lg shadow",
+            guessesRemaining >= 5
+              ? "bg-green-100 text-green-800"
+              : guessesRemaining >= 3
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          )}
+        >
           Guesses remaining: <span className="font-bold">{guessesRemaining}</span>
         </span>
       </div>
@@ -58,12 +76,7 @@ export default function Chain() {
             Reset game
           </Button>
         ) : (
-          <Button
-            variant="outline"
-            className="w-full bg-blue-200 hover:bg-blue-300"
-            onClick={confirmGuess}
-            disabled={status !== "guessing"}
-          >
+          <Button variant="outline" className="w-full bg-blue-200 hover:bg-blue-300" onClick={confirmGuess}>
             Confirm guess
           </Button>
         )}
