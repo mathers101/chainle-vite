@@ -1,6 +1,7 @@
 import { getTodaysDate } from "@/lib/time";
 import { MAX_GUESSES, type Guess } from "./ChainContext";
 import { Button } from "./ui/button";
+import { transpose } from "@/lib/transpose";
 
 interface ShareProps {
   correctChain: string[];
@@ -12,10 +13,10 @@ export default function Share({ correctChain, userGuesses }: ShareProps) {
     .split("-")
     .map((val) => Number(val.slice(-2)));
   const date = `${month}/${day}/${year}`;
-  const resultString = userGuesses
-    .map((guess) => {
+  const resultString = transpose(userGuesses)
+    .map((guess, idx) => {
       return guess
-        .map((word, idx) => {
+        .map((word) => {
           if (idx === 0 || idx === correctChain.length - 1) {
             return "🟨";
           } else if (word === correctChain[idx]) {
