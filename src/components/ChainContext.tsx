@@ -105,7 +105,7 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
       case "resetGuess": {
         return {
           ...state,
-          currentSuffixes: [],
+          currentSuffixes: defaultInitialState.currentSuffixes,
         };
       }
       case "setWinner": {
@@ -186,6 +186,7 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
   }, []);
 
   const resetGame = useCallback(() => dispatch({ type: "resetGame" }), []);
+  const resetGuess = useCallback(() => dispatch({ type: "resetGuess" }), []);
 
   const data = useMemo(
     () => ({
@@ -207,8 +208,9 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
       confirmGuess,
       resetGame,
       selectHintIndex,
+      resetGuess,
     }),
-    [setGuess, confirmGuess, resetGame, selectHintIndex]
+    [setGuess, confirmGuess, resetGame, resetGuess, selectHintIndex]
   );
 
   return (

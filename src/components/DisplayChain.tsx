@@ -1,33 +1,22 @@
 import { useEffect, useState } from "react";
-import { timeUntilTomorrow } from "../lib/time";
-import { cn } from "../lib/utils";
 import { useChainApi, useChainData } from "./ChainContext";
 import ChainInput from "./ChainInput";
 import DisplayInput from "./DisplayInput";
-import Share from "./Share";
 import { Button } from "./ui/button";
 
 export default function DisplayChain() {
   const [revealedIndexes, setRevealedIndexes] = useState<number[]>([]);
 
-  const { userGuesses, correctChain, solvedByIndex, currentChain, guessesRemaining, status } = useChainData();
+  const { solvedByIndex, currentChain, status } = useChainData();
   const { confirmGuess, resetGame, resetGuess } = useChainApi();
-  const { hours, minutes, seconds } = timeUntilTomorrow();
   const isWinner = status === "winner";
   const isLoser = status === "loser";
   const gameOver = isWinner || isLoser;
-  const isSelecting = status === "selecting";
-  const otherwise = !isSelecting && !gameOver;
-
-  const nextGameComponent = (
-    <span>{`Next chain available in ${hours} hours, ${minutes} minutes, ${seconds} seconds`}</span>
-  );
 
   const showDisplayInput = (index: number) => {
     if (status !== "guessing") return true;
     return solvedByIndex[index] ?? true;
   };
-  console.log("display input on 1", showDisplayInput(1));
 
   //   const handleConfirmGuess = async () => {
   //     // Snapshot the current unsolved indexes BEFORE confirming guess

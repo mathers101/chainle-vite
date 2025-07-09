@@ -24,7 +24,6 @@ export default function DisplayInput({ index, revealed }: ChainInputProps) {
   const gameOver = isWinner || isLoser;
   const disabled = gameOver || isSolved;
 
-  console.log(isSelectable, "isSelectable at index", index);
   // const shouldAnimate = useOneTimeAnimation(revealed, 600);
   // console.log("shouldAnimate", shouldAnimate);
 
