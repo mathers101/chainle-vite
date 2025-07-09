@@ -23,5 +23,5 @@ Chainle is a daily puzzle game where players complete a chain of words using val
 ### Install dependencies
 
 ```bash
-pnpm install
+npm install
 ```
