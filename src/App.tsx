@@ -17,7 +17,7 @@ function App() {
   // to anybody reading this, I realize a useEffect is a ridiculous way to fetch data you need on a real app. This app is extremely simple and doesn't currently have other features that would call for bringing in React Query, etc.
   useEffect(() => {
     const saved = fetchFromLocalStorage();
-    if (saved?.userGuesses && saved?.hintsByIndex) {
+    if (saved?.userGuesses && saved?.hints) {
       setSavedData(saved);
     }
     getTodaysChain();

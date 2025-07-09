@@ -3,7 +3,7 @@ import { saveToLocalStorage } from "../lib/localStorage";
 
 export const MAX_GUESSES = 5;
 
-type Status = "guessing" | "selecting" | "winner" | "loser";
+type Status = "initial" | "guessing" | "selecting" | "winner" | "loser";
 export type Guess = string[];
 
 interface ChainContextData {
@@ -14,6 +14,7 @@ interface ChainContextData {
   solvedByIndex: boolean[];
   status: Status;
   guessesRemaining: number;
+  hints: number[];
 }
 
 interface ChainContextApi {
@@ -21,12 +22,13 @@ interface ChainContextApi {
   confirmGuess: () => void;
   resetGame: () => void;
   selectHintIndex: (index: number) => void;
+  resetGuess: () => void;
 }
 
 export interface ChainState {
   userGuesses: Guess[];
   currentSuffixes: string[];
-  hintsByIndex: number[];
+  hints: number[];
   status: Status;
 }
 
@@ -37,7 +39,7 @@ interface ChainAction {
 
 export type SaveData = {
   userGuesses: Guess[];
-  hintsByIndex: number[];
+  hints: number[];
 };
 
 const ChainDataContext = createContext<ChainContextData | null>(null);
@@ -52,16 +54,20 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
   const defaultInitialState: ChainState = {
     userGuesses: [],
     currentSuffixes: correctChain.map(() => ""),
-    hintsByIndex: correctChain.map(() => 0),
+    hints: [],
     status: "guessing",
   };
+
   const numSavedGuesses = savedData?.userGuesses.length ?? 0;
-  const numSavedHints = savedData?.hintsByIndex.reduce((acc, cur) => acc + cur, 0) ?? 0;
-  const initialStatus = (numSavedGuesses > numSavedHints ? "selecting" : "guessing") as Status;
+  const numSavedHints = savedData?.hints?.length ?? 0;
+  const startingFromSaved = numSavedGuesses > 0;
+  const initialStatus = (
+    startingFromSaved ? (numSavedGuesses > numSavedHints ? "selecting" : "guessing") : "initial"
+  ) as Status;
   const initialState = {
     ...defaultInitialState,
     userGuesses: savedData?.userGuesses ?? [],
-    hintsByIndex: savedData?.hintsByIndex ?? defaultInitialState.hintsByIndex,
+    hintsByIndex: savedData?.hints ?? defaultInitialState.hints,
     status: initialStatus,
   };
   function reducer(state: ChainState, action: ChainAction): ChainState {
@@ -80,9 +86,10 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
       case "confirmGuess": {
         const { currentGuess } = action.payload;
         const guess = currentGuess.map((word: string) => word.trim().toLowerCase());
+        console.log("confirming guess", guess);
         return {
           ...state,
-          currentSuffixes: defaultInitialState.currentSuffixes,
+          // currentSuffixes: defaultInitialState.currentSuffixes,
           userGuesses: [...state.userGuesses, guess],
           status: "selecting",
         };
@@ -91,8 +98,14 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
         const { index } = action.payload;
         return {
           ...state,
-          hintsByIndex: state.hintsByIndex.map((num, i) => (i === index ? num + 1 : num)),
+          hints: [...state.hints, index],
           status: "guessing",
+        };
+      }
+      case "resetGuess": {
+        return {
+          ...state,
+          currentSuffixes: [],
         };
       }
       case "setWinner": {
@@ -115,7 +128,15 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
     }
   }
 
-  const [{ userGuesses, currentSuffixes, hintsByIndex, status }, dispatch] = useReducer(reducer, initialState);
+  const [{ userGuesses, currentSuffixes, hints, status }, dispatch] = useReducer(reducer, defaultInitialState);
+
+  const hintsByIndex: number[] = correctChain.map(() => 0);
+  for (let hintIndex of hints) {
+    hintsByIndex[hintIndex] += 1;
+  }
+
+  console.log("hints", hints);
+  console.log("hintsByIndex", hintsByIndex);
 
   const solvedByIndex: boolean[] = correctChain.map((_, index) => index === 0 || index === correctChain.length - 1);
 
@@ -138,7 +159,7 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
   const guessesRemaining = MAX_GUESSES - numGuesses;
 
   useEffect(() => {
-    saveToLocalStorage({ userGuesses, hintsByIndex });
+    saveToLocalStorage({ userGuesses, hints });
 
     if (solvedByIndex.every((solved) => solved)) {
       dispatch({ type: "setWinner" });
@@ -147,7 +168,7 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
     if (guessesRemaining === 0) {
       dispatch({ type: "setLoser" });
     }
-  }, [userGuesses, hintsByIndex]);
+  }, [userGuesses, hints]);
 
   const confirmGuess = useCallback(() => {
     dispatch({ type: "confirmGuess", payload: { currentGuess } });
@@ -160,12 +181,9 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
     [currentChain]
   );
 
-  const selectHintIndex = useCallback(
-    (index: number) => {
-      dispatch({ type: "selectHintIndex", payload: { index } });
-    },
-    [hintsByIndex]
-  );
+  const selectHintIndex = useCallback((index: number) => {
+    dispatch({ type: "selectHintIndex", payload: { index } });
+  }, []);
 
   const resetGame = useCallback(() => dispatch({ type: "resetGame" }), []);
 
@@ -178,8 +196,9 @@ export function ChainProvider({ children, correctChain, savedData }: PropsWithCh
       status,
       userGuesses,
       guessesRemaining,
+      hints,
     }),
-    [correctChain, status, currentChain, userGuesses, currentGuess, guessesRemaining, solvedByIndex]
+    [correctChain, status, currentChain, userGuesses, currentGuess, guessesRemaining, hints, solvedByIndex]
   );
 
   const api = useMemo(

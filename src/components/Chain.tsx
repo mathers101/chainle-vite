@@ -2,12 +2,12 @@ import { timeUntilTomorrow } from "../lib/time";
 import { cn } from "../lib/utils";
 import { useChainApi, useChainData } from "./ChainContext";
 import ChainInput from "./ChainInput";
+import DisplayChain from "./DisplayChain";
 import Share from "./Share";
 import { Button } from "./ui/button";
 
 export default function Chain() {
   const { userGuesses, correctChain, currentChain, guessesRemaining, status } = useChainData();
-  const { confirmGuess, resetGame } = useChainApi();
   const { hours, minutes, seconds } = timeUntilTomorrow();
   const isWinner = status === "winner";
   const isLoser = status === "loser";
@@ -69,23 +69,7 @@ export default function Chain() {
           </span>
         )}
       </div>
-      <div className="relative flex flex-col gap-3">
-        {currentChain.map((_, index) => (
-          <div className="flex flex-row items-center" key={index}>
-            <ChainInput index={index} />
-            {/* <NumberIncorrect num={mistakesByIndex[index]} /> */}
-          </div>
-        ))}
-        {gameOver ? (
-          <Button variant="destructive" onClick={resetGame} className="w-full">
-            Reset game
-          </Button>
-        ) : (
-          <Button variant="outline" className="w-full bg-blue-200 hover:bg-blue-300" onClick={confirmGuess}>
-            Confirm guess
-          </Button>
-        )}
-      </div>
+      <DisplayChain />
     </div>
   );
 }
