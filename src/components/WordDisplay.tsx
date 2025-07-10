@@ -1,4 +1,3 @@
-import { useOneTimeAnimation } from "@/hooks/useOneTimeAnimation";
 import { cn } from "../lib/utils";
 import { useChainData, useChainApi } from "./ChainContext";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
@@ -8,7 +7,7 @@ interface ChainInputProps {
   revealed: boolean;
 }
 
-export default function DisplayInput({ index, revealed }: ChainInputProps) {
+export default function WordDisplay({ index, revealed }: ChainInputProps) {
   const { status, correctChain, currentChain, solvedByIndex } = useChainData();
   const { selectHintIndex } = useChainApi();
 
@@ -24,8 +23,7 @@ export default function DisplayInput({ index, revealed }: ChainInputProps) {
   const gameOver = isWinner || isLoser;
   const disabled = gameOver || isSolved;
 
-  // const shouldAnimate = useOneTimeAnimation(revealed, 600);
-  // console.log("shouldAnimate", shouldAnimate);
+  const shouldAnimate = revealed && !isInitialWord;
 
   return (
     <div onClick={isSelectable ? handleSelect : undefined}>
@@ -38,17 +36,21 @@ export default function DisplayInput({ index, revealed }: ChainInputProps) {
         className={isSelectable ? "cursor-pointer" : "cursor-not-allowed"}
         spellCheck={false}
       >
-        <InputOTPGroup className={cn("uppercase", revealed ? "animate-vflip backface-hidden" : "")}>
+        <InputOTPGroup
+          className={cn(
+            "uppercase",
+            isWinner ? "animate-bounce" : shouldAnimate ? "animate-vflip backface-hidden" : ""
+          )}
+        >
           {Array.from({ length: 10 }, (_, letterIndex) => {
             return (
               <InputOTPSlot
                 inputMode="text"
                 key={letterIndex}
-                // slotClassName="animate-vflip backface-hidden"
                 index={letterIndex}
                 className={cn(
                   "border-gray-700",
-                  isInitialWord ? "bg-yellow-400" : isSolved ? "bg-green-500" : gameOver ? "bg-gray-300" : ""
+                  isInitialWord ? "bg-yellow-400/80" : isSolved ? "bg-green-500/90" : gameOver ? "bg-gray-300" : ""
                 )}
               />
             );

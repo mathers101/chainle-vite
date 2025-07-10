@@ -1,11 +1,11 @@
 import "./App.css";
-import Chain from "./components/Chain";
 import { ChainProvider, type SaveData } from "./components/ChainContext";
 import { useEffect, useState } from "react";
 import { getTodaysDate } from "./lib/time";
 import { createClient } from "@supabase/supabase-js";
 import { fetchFromLocalStorage } from "./lib/localStorage";
 import { Spinner } from "./components/ui/spinner";
+import Game from "./components/Game";
 
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
 
@@ -33,7 +33,7 @@ function App() {
       {/* <Spinner size="large" className="text-blue-300" /> */}
       {chain ? (
         <ChainProvider correctChain={chain} savedData={savedData}>
-          <Chain />
+          <Game />
         </ChainProvider>
       ) : (
         <Spinner size="large" className="text-blue-300" />
