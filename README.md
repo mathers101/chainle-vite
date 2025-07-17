@@ -1,5 +1,7 @@
 # Chainle
 
+THIS IS AN OLD VERSION OF CHAINLE MADE WITH VITE. CURRENT VERSION IS MADE WITH EXPO: https://github.com/mathers101/chainle
+
 Chainle is a daily puzzle game where players complete a chain of words using valid two-word phrases. Each day's puzzle starts with a hidden chain, and players guess words to complete the chain as efficiently as possible.
 
 ## Features
